@@ -30,57 +30,7 @@
 							"type": "JsonWriteSettings"
 						}
 					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "ID",
-									"type": "NUMBER"
-								},
-								"sink": {
-									"path": "$['Column_1']"
-								}
-							},
-							{
-								"source": {
-									"name": "CONTACT",
-									"type": "VARCHAR"
-								},
-								"sink": {
-									"path": "$['Column_2']"
-								}
-							},
-							{
-								"source": {
-									"name": "ORDER_DATE",
-									"type": "DATE"
-								},
-								"sink": {
-									"path": "$['Column_3']"
-								}
-							},
-							{
-								"source": {
-									"name": "PHONE",
-									"type": "VARCHAR"
-								},
-								"sink": {
-									"path": "$['Column_4']"
-								}
-							},
-							{
-								"source": {
-									"name": "YEAR_COL",
-									"type": "NUMBER"
-								},
-								"sink": {
-									"path": "$['Column_5']"
-								}
-							}
-						]
-					}
+					"enableStaging": false
 				},
 				"inputs": [
 					{
