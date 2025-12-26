@@ -1,0 +1,9 @@
+{
+	"name": "RajkumarAdfLti",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "34c07609-585a-49b9-ad23-59baac455ada",
+		"tenantId": "c43e9538-821a-407f-8f42-c8c55d23e5f9"
+	}
+}
