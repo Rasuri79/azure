@@ -1,0 +1,101 @@
+{
+	"name": "SnowToAzure",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SnowflakeV2Source",
+						"exportSettings": {
+							"type": "SnowflakeExportCopyCommand"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "ID",
+									"type": "NUMBER"
+								},
+								"sink": {
+									"path": "$['Column_1']"
+								}
+							},
+							{
+								"source": {
+									"name": "CONTACT",
+									"type": "VARCHAR"
+								},
+								"sink": {
+									"path": "$['Column_2']"
+								}
+							},
+							{
+								"source": {
+									"name": "ORDER_DATE",
+									"type": "DATE"
+								},
+								"sink": {
+									"path": "$['Column_3']"
+								}
+							},
+							{
+								"source": {
+									"name": "PHONE",
+									"type": "VARCHAR"
+								},
+								"sink": {
+									"path": "$['Column_4']"
+								}
+							},
+							{
+								"source": {
+									"name": "YEAR_COL",
+									"type": "NUMBER"
+								},
+								"sink": {
+									"path": "$['Column_5']"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SnowflakeTable1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Json4",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
