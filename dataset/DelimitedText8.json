@@ -1,24 +1,15 @@
 {
-	"name": "DelimitedText9",
+	"name": "DelimitedText8",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureBlobStorage3",
 			"type": "LinkedServiceReference"
-		},
-		"parameters": {
-			"filename": {
-				"type": "string"
-			}
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": {
-					"value": "@dataset().filename",
-					"type": "Expression"
-				},
 				"container": "output"
 			},
 			"columnDelimiter": ",",
@@ -28,11 +19,23 @@
 		},
 		"schema": [
 			{
-				"name": "EmpID",
+				"name": "EmployeeID",
 				"type": "String"
 			},
 			{
-				"name": "Name",
+				"name": "FirstName",
+				"type": "String"
+			},
+			{
+				"name": "LastName",
+				"type": "String"
+			},
+			{
+				"name": "Email",
+				"type": "String"
+			},
+			{
+				"name": "Phone",
 				"type": "String"
 			},
 			{
@@ -40,7 +43,11 @@
 				"type": "String"
 			},
 			{
-				"name": "Location",
+				"name": "HireDate",
+				"type": "String"
+			},
+			{
+				"name": "Salary",
 				"type": "String"
 			}
 		]
