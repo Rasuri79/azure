@@ -123,9 +123,21 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@activity('Lookup1').output.count",
+									"value": "@greater(activity('Lookup1').output.count,0)",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "Fail1",
+										"type": "Fail",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"message": "file has no data",
+											"errorCode": "404"
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "Copy data1",
