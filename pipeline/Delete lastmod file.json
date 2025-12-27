@@ -24,6 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
 						"modifiedDatetimeEnd": {
 							"value": "@addhours(utcNow(),-4)",
 							"type": "Expression"
@@ -46,11 +47,7 @@
 						]
 					}
 				],
-				"userProperties": [
-					{
-						"name": "filename"
-					}
-				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('Get Metadata1').output.itemName",
