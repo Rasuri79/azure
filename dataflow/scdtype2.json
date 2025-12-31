@@ -1,0 +1,38 @@
+{
+	"name": "scdtype2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "employee_dim",
+						"type": "DatasetReference"
+					},
+					"name": "empcsv"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "drvhashdiff"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          emp_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          dept as string,",
+				"          title as string,",
+				"          email as string,",
+				"          phone as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empcsv",
+				"empcsv derive(hashdiff = md5(concat(toString(emp_id),'|',first_name))) ~> drvhashdiff"
+			]
+		}
+	}
+}
