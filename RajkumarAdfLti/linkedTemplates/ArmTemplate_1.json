@@ -1275,7 +1275,7 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> emptable",
-						"empcsv derive(hashdiff = md5(concat(toString(emp_id),'|',first_name))) ~> drvhashdiff",
+						"empcsv derive(hashdiff = md5(concat(toString(emp_id),'|',first_name,'|',last_name,'|',dept,'|',title,'|',email,'|',phone))) ~> drvhashdiff",
 						"drvhashdiff, emptable lookup(empcsv@emp_id == emptable@emp_id,",
 						"     multiple: false,",
 						"     pickup: 'any',",
