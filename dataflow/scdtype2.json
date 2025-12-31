@@ -21,6 +21,10 @@
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "dimEmployee",
+						"type": "DatasetReference"
+					},
 					"name": "sink1"
 				}
 			],
@@ -156,8 +160,28 @@
 				"select1, select2, select3 union(byName: true)~> union1",
 				"union1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          employee_sk as integer,",
+				"          emp_id as string,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          dept as string,",
+				"          title as string,",
+				"          email as string,",
+				"          phone as string,",
+				"          hashdiff as string,",
+				"          is_active as boolean,",
+				"          effective_start_dt as date,",
+				"          effective_end_dt as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
