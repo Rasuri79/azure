@@ -10,12 +10,53 @@
 						"type": "DatasetReference"
 					},
 					"name": "empcsv"
+				},
+				{
+					"dataset": {
+						"referenceName": "dimEmployee",
+						"type": "DatasetReference"
+					},
+					"name": "emptable"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "drvhashdiff"
+				},
+				{
+					"name": "lkpemp"
+				},
+				{
+					"name": "isActive"
+				},
+				{
+					"name": "cstype2"
+				},
+				{
+					"name": "arinsert"
+				},
+				{
+					"name": "changedreccords"
+				},
+				{
+					"name": "arinactive"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "union1"
 				}
 			],
 			"scriptLines": [
@@ -31,7 +72,92 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> empcsv",
-				"empcsv derive(hashdiff = md5(concat(toString(emp_id),'|',first_name))) ~> drvhashdiff"
+				"source(output(",
+				"          employee_sk as integer,",
+				"          emp_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          dept as string,",
+				"          title as string,",
+				"          email as string,",
+				"          phone as string,",
+				"          hashdiff as string,",
+				"          is_active as boolean,",
+				"          effective_start_dt as date,",
+				"          effective_end_dt as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> emptable",
+				"empcsv derive(hashdiff = md5(concat(toString(emp_id),'|',first_name))) ~> drvhashdiff",
+				"drvhashdiff, emptable lookup(empcsv@emp_id == emptable@emp_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lkpemp",
+				"lkpemp derive(is_active = iif(isNull(emptable@emp_id),toBoolean('1') ,is_active),",
+				"          effective_start_dt = iif(isNull(emptable@emp_id), currentDate(), effective_start_dt),",
+				"          effective_end_dt = iif(is_active==false(), currentDate(), toDate(null()))) ~> isActive",
+				"isActive split(isNull(emptable@emp_id),",
+				"     !isNull(emptable@emp_id)&&emptable@hashdiff!=drvhashdiff@hashdiff,",
+				"     !isNull(emptable@emp_id) &&is_active==false(),",
+				"     disjoint: false) ~> cstype2@(newrecords, changedrecords, inactiverecords)",
+				"cstype2@newrecords alterRow(insertIf(true())) ~> arinsert",
+				"cstype2@changedrecords alterRow(updateIf(true())) ~> changedreccords",
+				"cstype2@inactiverecords alterRow(updateIf(true())) ~> arinactive",
+				"arinsert select(mapColumn(",
+				"          emp_id = cstype2@newrecords@emp_id,",
+				"          first_name = cstype2@newrecords@first_name,",
+				"          last_name = cstype2@newrecords@last_name,",
+				"          dept = cstype2@newrecords@dept,",
+				"          title = cstype2@newrecords@title,",
+				"          email = cstype2@newrecords@email,",
+				"          phone = cstype2@newrecords@phone,",
+				"          hashdiff = cstype2@newrecords@hashdiff,",
+				"          employee_sk,",
+				"          is_active,",
+				"          effective_start_dt,",
+				"          effective_end_dt",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"changedreccords select(mapColumn(",
+				"          emp_id = cstype2@changedrecords@emp_id,",
+				"          first_name = cstype2@changedrecords@first_name,",
+				"          last_name = cstype2@changedrecords@last_name,",
+				"          dept = cstype2@changedrecords@dept,",
+				"          title = cstype2@changedrecords@title,",
+				"          email = cstype2@changedrecords@email,",
+				"          phone = cstype2@changedrecords@phone,",
+				"          hashdiff = cstype2@changedrecords@hashdiff,",
+				"          employee_sk,",
+				"          is_active,",
+				"          effective_start_dt,",
+				"          effective_end_dt",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"arinactive select(mapColumn(",
+				"          emp_id = cstype2@inactiverecords@emp_id,",
+				"          first_name = cstype2@inactiverecords@first_name,",
+				"          last_name = cstype2@inactiverecords@last_name,",
+				"          dept = cstype2@inactiverecords@dept,",
+				"          title = cstype2@inactiverecords@title,",
+				"          email = cstype2@inactiverecords@email,",
+				"          phone = cstype2@inactiverecords@phone,",
+				"          hashdiff = cstype2@inactiverecords@hashdiff,",
+				"          employee_sk,",
+				"          is_active,",
+				"          effective_start_dt,",
+				"          effective_end_dt",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select1, select2, select3 union(byName: true)~> union1",
+				"union1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
