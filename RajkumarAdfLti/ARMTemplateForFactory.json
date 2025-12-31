@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'AzureSqlDatabase1'"
 		},
+		"AzureSqlDatabase2_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'AzureSqlDatabase2'"
+		},
 		"Snowflake1_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Snowflake1'"
@@ -36,6 +40,18 @@
 			"defaultValue": "free-sql-db-2721515"
 		},
 		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "CloudSAd5cf10cb"
+		},
+		"AzureSqlDatabase2_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "rajltisql.database.windows.net"
+		},
+		"AzureSqlDatabase2_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "free-sql-db-2721515"
+		},
+		"AzureSqlDatabase2_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "CloudSAd5cf10cb"
 		},
@@ -903,6 +919,53 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/scdtype2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "scdtype2",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "scdtype2",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"empcsv": {},
+									"emptable": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/scdtype2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1041,6 +1104,64 @@
 					},
 					{
 						"name": "Location",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText11')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "employee_sample.csv",
+						"folderPath": "Employee",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "emp_id",
+						"type": "String"
+					},
+					{
+						"name": "first_name",
+						"type": "String"
+					},
+					{
+						"name": "last_name",
+						"type": "String"
+					},
+					{
+						"name": "dept",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "email",
+						"type": "String"
+					},
+					{
+						"name": "phone",
 						"type": "String"
 					}
 				]
@@ -1599,6 +1720,206 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dimEmployee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "employee_sk",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "emp_id",
+						"type": "varchar"
+					},
+					{
+						"name": "first_name",
+						"type": "varchar"
+					},
+					{
+						"name": "last_name",
+						"type": "varchar"
+					},
+					{
+						"name": "dept",
+						"type": "varchar"
+					},
+					{
+						"name": "title",
+						"type": "varchar"
+					},
+					{
+						"name": "email",
+						"type": "varchar"
+					},
+					{
+						"name": "phone",
+						"type": "varchar"
+					},
+					{
+						"name": "hashdiff",
+						"type": "varchar"
+					},
+					{
+						"name": "is_active",
+						"type": "bit"
+					},
+					{
+						"name": "effective_start_dt",
+						"type": "date"
+					},
+					{
+						"name": "effective_end_dt",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dim_employee"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dim_employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "employee_sk",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "emp_id",
+						"type": "varchar"
+					},
+					{
+						"name": "first_name",
+						"type": "varchar"
+					},
+					{
+						"name": "last_name",
+						"type": "varchar"
+					},
+					{
+						"name": "dept",
+						"type": "varchar"
+					},
+					{
+						"name": "title",
+						"type": "varchar"
+					},
+					{
+						"name": "email",
+						"type": "varchar"
+					},
+					{
+						"name": "phone",
+						"type": "varchar"
+					},
+					{
+						"name": "hashdiff",
+						"type": "varchar"
+					},
+					{
+						"name": "is_active",
+						"type": "bit"
+					},
+					{
+						"name": "effective_start_dt",
+						"type": "date"
+					},
+					{
+						"name": "effective_end_dt",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dim_employee"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/employee_dim')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage3",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "employee_sample.csv",
+						"folderPath": "Employee",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "emp_id",
+						"type": "String"
+					},
+					{
+						"name": "first_name",
+						"type": "String"
+					},
+					{
+						"name": "last_name",
+						"type": "String"
+					},
+					{
+						"name": "dept",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "email",
+						"type": "String"
+					},
+					{
+						"name": "phone",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage3')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1654,6 +1975,28 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('AzureSqlDatabase1_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AzureSqlDatabase2_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSqlDatabase2_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AzureSqlDatabase2_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('AzureSqlDatabase2_password')]"
 					}
 				}
 			},
@@ -1828,6 +2171,200 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DelimitedText4')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/scdtype2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "employee_dim",
+								"type": "DatasetReference"
+							},
+							"name": "empcsv"
+						},
+						{
+							"dataset": {
+								"referenceName": "dimEmployee",
+								"type": "DatasetReference"
+							},
+							"name": "emptable"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dimEmployee",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "drvhashdiff"
+						},
+						{
+							"name": "lkpemp"
+						},
+						{
+							"name": "isActive"
+						},
+						{
+							"name": "cstype2"
+						},
+						{
+							"name": "arinsert"
+						},
+						{
+							"name": "changedreccords"
+						},
+						{
+							"name": "arinactive"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "union1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          emp_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          dept as string,",
+						"          title as string,",
+						"          email as string,",
+						"          phone as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> empcsv",
+						"source(output(",
+						"          employee_sk as integer,",
+						"          emp_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          dept as string,",
+						"          title as string,",
+						"          email as string,",
+						"          phone as string,",
+						"          hashdiff as string,",
+						"          is_active as boolean,",
+						"          effective_start_dt as date,",
+						"          effective_end_dt as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> emptable",
+						"empcsv derive(hashdiff = md5(concat(toString(emp_id),'|',first_name))) ~> drvhashdiff",
+						"drvhashdiff, emptable lookup(empcsv@emp_id == emptable@emp_id,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lkpemp",
+						"lkpemp derive(is_active = iif(isNull(emptable@emp_id),toBoolean('1') ,is_active),",
+						"          effective_start_dt = iif(isNull(emptable@emp_id), currentDate(), effective_start_dt),",
+						"          effective_end_dt = iif(is_active==false(), currentDate(), toDate(null()))) ~> isActive",
+						"isActive split(isNull(emptable@emp_id),",
+						"     !isNull(emptable@emp_id)&&emptable@hashdiff!=drvhashdiff@hashdiff,",
+						"     !isNull(emptable@emp_id) &&is_active==false(),",
+						"     disjoint: false) ~> cstype2@(newrecords, changedrecords, inactiverecords)",
+						"cstype2@newrecords alterRow(insertIf(true())) ~> arinsert",
+						"cstype2@changedrecords alterRow(updateIf(true())) ~> changedreccords",
+						"cstype2@inactiverecords alterRow(updateIf(true())) ~> arinactive",
+						"arinsert select(mapColumn(",
+						"          emp_id = cstype2@newrecords@emp_id,",
+						"          first_name = cstype2@newrecords@first_name,",
+						"          last_name = cstype2@newrecords@last_name,",
+						"          dept = cstype2@newrecords@dept,",
+						"          title = cstype2@newrecords@title,",
+						"          email = cstype2@newrecords@email,",
+						"          phone = cstype2@newrecords@phone,",
+						"          hashdiff = cstype2@newrecords@hashdiff,",
+						"          employee_sk,",
+						"          is_active,",
+						"          effective_start_dt,",
+						"          effective_end_dt",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"changedreccords select(mapColumn(",
+						"          emp_id = cstype2@changedrecords@emp_id,",
+						"          first_name = cstype2@changedrecords@first_name,",
+						"          last_name = cstype2@changedrecords@last_name,",
+						"          dept = cstype2@changedrecords@dept,",
+						"          title = cstype2@changedrecords@title,",
+						"          email = cstype2@changedrecords@email,",
+						"          phone = cstype2@changedrecords@phone,",
+						"          hashdiff = cstype2@changedrecords@hashdiff,",
+						"          employee_sk,",
+						"          is_active,",
+						"          effective_start_dt,",
+						"          effective_end_dt",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"arinactive select(mapColumn(",
+						"          emp_id = cstype2@inactiverecords@emp_id,",
+						"          first_name = cstype2@inactiverecords@first_name,",
+						"          last_name = cstype2@inactiverecords@last_name,",
+						"          dept = cstype2@inactiverecords@dept,",
+						"          title = cstype2@inactiverecords@title,",
+						"          email = cstype2@inactiverecords@email,",
+						"          phone = cstype2@inactiverecords@phone,",
+						"          hashdiff = cstype2@inactiverecords@hashdiff,",
+						"          employee_sk,",
+						"          is_active,",
+						"          effective_start_dt,",
+						"          effective_end_dt",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"select1, select2, select3 union(byName: true)~> union1",
+						"union1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          employee_sk as integer,",
+						"          emp_id as string,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          dept as string,",
+						"          title as string,",
+						"          email as string,",
+						"          phone as string,",
+						"          hashdiff as string,",
+						"          is_active as boolean,",
+						"          effective_start_dt as date,",
+						"          effective_end_dt as date",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/employee_dim')]",
+				"[concat(variables('factoryId'), '/datasets/dimEmployee')]"
 			]
 		}
 	]

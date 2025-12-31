@@ -14,6 +14,9 @@
 		"AzureSqlDatabase1_password": {
 			"value": ""
 		},
+		"AzureSqlDatabase2_password": {
+			"value": ""
+		},
 		"Snowflake1_password": {
 			"value": ""
 		},
@@ -27,6 +30,15 @@
 			"value": "free-sql-db-2721515"
 		},
 		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "CloudSAd5cf10cb"
+		},
+		"AzureSqlDatabase2_properties_typeProperties_server": {
+			"value": "rajltisql.database.windows.net"
+		},
+		"AzureSqlDatabase2_properties_typeProperties_database": {
+			"value": "free-sql-db-2721515"
+		},
+		"AzureSqlDatabase2_properties_typeProperties_userName": {
 			"value": "CloudSAd5cf10cb"
 		},
 		"Snowflake1_properties_typeProperties_database": {
