@@ -180,75 +180,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dim_employee')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "employee_sk",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "emp_id",
-						"type": "varchar"
-					},
-					{
-						"name": "first_name",
-						"type": "varchar"
-					},
-					{
-						"name": "last_name",
-						"type": "varchar"
-					},
-					{
-						"name": "dept",
-						"type": "varchar"
-					},
-					{
-						"name": "title",
-						"type": "varchar"
-					},
-					{
-						"name": "email",
-						"type": "varchar"
-					},
-					{
-						"name": "phone",
-						"type": "varchar"
-					},
-					{
-						"name": "hashdiff",
-						"type": "varchar"
-					},
-					{
-						"name": "is_active",
-						"type": "bit"
-					},
-					{
-						"name": "effective_start_dt",
-						"type": "date"
-					},
-					{
-						"name": "effective_end_dt",
-						"type": "date"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "dim_employee"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/employee_dim')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -301,6 +232,76 @@
 						"type": "String"
 					}
 				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dim_employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "employee_sk",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "emp_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "first_name",
+						"type": "varchar"
+					},
+					{
+						"name": "last_name",
+						"type": "varchar"
+					},
+					{
+						"name": "dept",
+						"type": "varchar"
+					},
+					{
+						"name": "title",
+						"type": "varchar"
+					},
+					{
+						"name": "email",
+						"type": "varchar"
+					},
+					{
+						"name": "phone",
+						"type": "varchar"
+					},
+					{
+						"name": "hashdiff",
+						"type": "char"
+					},
+					{
+						"name": "is_active",
+						"type": "bit"
+					},
+					{
+						"name": "effective_start_dt",
+						"type": "date"
+					},
+					{
+						"name": "effective_end_dt",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dim_employee"
+				}
 			},
 			"dependsOn": []
 		},
@@ -1194,7 +1195,7 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "dimEmployee",
+								"referenceName": "dim_employee",
 								"type": "DatasetReference"
 							},
 							"name": "emptable"
@@ -1203,21 +1204,21 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "dimEmployee",
+								"referenceName": "dim_employee",
 								"type": "DatasetReference"
 							},
 							"name": "sinkInsert"
 						},
 						{
 							"dataset": {
-								"referenceName": "dimEmployee",
+								"referenceName": "dim_employee",
 								"type": "DatasetReference"
 							},
 							"name": "sinkChangedInsert"
 						},
 						{
 							"dataset": {
-								"referenceName": "dimEmployee",
+								"referenceName": "dim_employee",
 								"type": "DatasetReference"
 							},
 							"name": "UpdateSink"
@@ -1387,7 +1388,7 @@
 						"     validateSchema: false,",
 						"     input(",
 						"          employee_sk as integer,",
-						"          emp_id as string,",
+						"          emp_id as integer,",
 						"          first_name as string,",
 						"          last_name as string,",
 						"          dept as string,",
@@ -1424,7 +1425,7 @@
 						"     validateSchema: false,",
 						"     input(",
 						"          employee_sk as integer,",
-						"          emp_id as string,",
+						"          emp_id as integer,",
 						"          first_name as string,",
 						"          last_name as string,",
 						"          dept as string,",
@@ -1448,7 +1449,7 @@
 						"     validateSchema: false,",
 						"     input(",
 						"          employee_sk as integer,",
-						"          emp_id as string,",
+						"          emp_id as integer,",
 						"          first_name as string,",
 						"          last_name as string,",
 						"          dept as string,",
@@ -1479,7 +1480,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/employee_dim')]",
-				"[concat(variables('factoryId'), '/datasets/dimEmployee')]"
+				"[concat(variables('factoryId'), '/datasets/dim_employee')]"
 			]
 		},
 		{
@@ -1605,7 +1606,8 @@
 									"sinkInsert": {},
 									"sinkChangedInsert": {},
 									"UpdateSink": {}
-								}
+								},
+								"linkedServiceParameters": {}
 							},
 							"staging": {},
 							"compute": {
