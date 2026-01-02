@@ -178,7 +178,20 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          emp_id,",
+				"          first_name,",
+				"          last_name,",
+				"          dept,",
+				"          title,",
+				"          email,",
+				"          phone,",
+				"          hashdiff,",
+				"          is_active,",
+				"          effective_start_dt,",
+				"          effective_end_dt",
+				"     )) ~> sink1"
 			]
 		}
 	}
