@@ -22,21 +22,21 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "dimEmployee",
+						"referenceName": "dim_employee",
 						"type": "DatasetReference"
 					},
 					"name": "sinkInsert"
 				},
 				{
 					"dataset": {
-						"referenceName": "dimEmployee",
+						"referenceName": "dim_employee",
 						"type": "DatasetReference"
 					},
 					"name": "sinkChangedInsert"
 				},
 				{
 					"dataset": {
-						"referenceName": "dimEmployee",
+						"referenceName": "dim_employee",
 						"type": "DatasetReference"
 					},
 					"name": "UpdateSink"
@@ -101,7 +101,7 @@
 				"     ignoreNoFilesFound: false) ~> empcsv",
 				"source(output(",
 				"          employee_sk as integer,",
-				"          emp_id as string,",
+				"          emp_id as integer,",
 				"          first_name as string,",
 				"          last_name as string,",
 				"          dept as string,",
@@ -206,7 +206,7 @@
 				"     validateSchema: false,",
 				"     input(",
 				"          employee_sk as integer,",
-				"          emp_id as string,",
+				"          emp_id as integer,",
 				"          first_name as string,",
 				"          last_name as string,",
 				"          dept as string,",
@@ -243,7 +243,7 @@
 				"     validateSchema: false,",
 				"     input(",
 				"          employee_sk as integer,",
-				"          emp_id as string,",
+				"          emp_id as integer,",
 				"          first_name as string,",
 				"          last_name as string,",
 				"          dept as string,",
@@ -267,7 +267,7 @@
 				"     validateSchema: false,",
 				"     input(",
 				"          employee_sk as integer,",
-				"          emp_id as string,",
+				"          emp_id as integer,",
 				"          first_name as string,",
 				"          last_name as string,",
 				"          dept as string,",
