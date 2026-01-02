@@ -25,7 +25,21 @@
 						"referenceName": "dimEmployee",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "sinkInsert"
+				},
+				{
+					"dataset": {
+						"referenceName": "dimEmployee",
+						"type": "DatasetReference"
+					},
+					"name": "sinkChangedInsert"
+				},
+				{
+					"dataset": {
+						"referenceName": "dimEmployee",
+						"type": "DatasetReference"
+					},
+					"name": "UpdateSink"
 				}
 			],
 			"transformations": [
@@ -48,13 +62,10 @@
 					"name": "arinactive"
 				},
 				{
-					"name": "select1"
+					"name": "newSelect"
 				},
 				{
-					"name": "select3"
-				},
-				{
-					"name": "union1"
+					"name": "inactiveSelect"
 				},
 				{
 					"name": "derivedexpireOld"
@@ -135,7 +146,7 @@
 				"          effective_end_dt",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
+				"     skipDuplicateMapOutputs: true) ~> newSelect",
 				"arinactive select(mapColumn(",
 				"          emp_id = cstype2@inactiverecords@emp_id,",
 				"          first_name = cstype2@inactiverecords@first_name,",
@@ -151,8 +162,7 @@
 				"          effective_end_dt",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select3",
-				"select1, expiredselect, select3, insertselect union(byName: true)~> union1",
+				"     skipDuplicateMapOutputs: true) ~> inactiveSelect",
 				"cstype2@changedrecords derive(is_active = false(),",
 				"          effective_end_dt = currentDate()) ~> derivedexpireOld",
 				"derivedexpireOld alterRow(updateIf(true())) ~> alterexpired",
@@ -192,7 +202,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> insertselect",
-				"union1 sink(allowSchemaDrift: true,",
+				"newSelect sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          employee_sk as integer,",
@@ -210,15 +220,13 @@
 				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
-				"     updateable:true,",
+				"     updateable:false,",
 				"     upsertable:false,",
-				"     keys:['employee_sk'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          employee_sk,",
 				"          emp_id,",
 				"          first_name,",
 				"          last_name,",
@@ -230,7 +238,61 @@
 				"          is_active,",
 				"          effective_start_dt,",
 				"          effective_end_dt",
-				"     )) ~> sink1"
+				"     )) ~> sinkInsert",
+				"insertselect sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          employee_sk as integer,",
+				"          emp_id as string,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          dept as string,",
+				"          title as string,",
+				"          email as string,",
+				"          phone as string,",
+				"          hashdiff as string,",
+				"          is_active as boolean,",
+				"          effective_start_dt as date,",
+				"          effective_end_dt as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkChangedInsert",
+				"expiredselect sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          employee_sk as integer,",
+				"          emp_id as string,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          dept as string,",
+				"          title as string,",
+				"          email as string,",
+				"          phone as string,",
+				"          hashdiff as string,",
+				"          is_active as boolean,",
+				"          effective_start_dt as date,",
+				"          effective_end_dt as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['employee_sk'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          employee_sk,",
+				"          is_active,",
+				"          effective_end_dt",
+				"     )) ~> UpdateSink"
 			]
 		}
 	}
