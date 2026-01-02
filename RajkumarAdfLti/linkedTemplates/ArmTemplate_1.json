@@ -1226,22 +1226,34 @@
 							"name": "arinsert"
 						},
 						{
-							"name": "changedreccords"
-						},
-						{
 							"name": "arinactive"
 						},
 						{
 							"name": "select1"
 						},
 						{
-							"name": "select2"
-						},
-						{
 							"name": "select3"
 						},
 						{
 							"name": "union1"
+						},
+						{
+							"name": "derivedexpireOld"
+						},
+						{
+							"name": "alterexpired"
+						},
+						{
+							"name": "derivedinsert"
+						},
+						{
+							"name": "alertinsert"
+						},
+						{
+							"name": "expiredselect"
+						},
+						{
+							"name": "insertselect"
 						}
 					],
 					"scriptLines": [
@@ -1288,7 +1300,6 @@
 						"     !isNull(emptable@emp_id) &&is_active==false(),",
 						"     disjoint: false) ~> cstype2@(newrecords, changedrecords, inactiverecords)",
 						"cstype2@newrecords alterRow(insertIf(true())) ~> arinsert",
-						"cstype2@changedrecords alterRow(upsertIf(true())) ~> changedreccords",
 						"cstype2@inactiverecords alterRow(updateIf(true())) ~> arinactive",
 						"arinsert select(mapColumn(",
 						"          emp_id = cstype2@newrecords@emp_id,",
@@ -1299,27 +1310,13 @@
 						"          email = cstype2@newrecords@email,",
 						"          phone = cstype2@newrecords@phone,",
 						"          hashdiff = cstype2@newrecords@hashdiff,",
+						"          employee_sk,",
 						"          is_active,",
 						"          effective_start_dt,",
 						"          effective_end_dt",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select1",
-						"changedreccords select(mapColumn(",
-						"          emp_id = cstype2@changedrecords@emp_id,",
-						"          first_name = cstype2@changedrecords@first_name,",
-						"          last_name = cstype2@changedrecords@last_name,",
-						"          dept = cstype2@changedrecords@dept,",
-						"          title = cstype2@changedrecords@title,",
-						"          email = cstype2@changedrecords@email,",
-						"          phone = cstype2@changedrecords@phone,",
-						"          hashdiff = cstype2@changedrecords@hashdiff,",
-						"          is_active,",
-						"          effective_start_dt,",
-						"          effective_end_dt",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select2",
 						"arinactive select(mapColumn(",
 						"          emp_id = cstype2@inactiverecords@emp_id,",
 						"          first_name = cstype2@inactiverecords@first_name,",
@@ -1329,13 +1326,53 @@
 						"          email = cstype2@inactiverecords@email,",
 						"          phone = cstype2@inactiverecords@phone,",
 						"          hashdiff = cstype2@inactiverecords@hashdiff,",
+						"          employee_sk,",
 						"          is_active,",
 						"          effective_start_dt,",
 						"          effective_end_dt",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select3",
-						"select1, select2, select3 union(byName: true)~> union1",
+						"select1, expiredselect, select3, insertselect union(byName: true)~> union1",
+						"cstype2@changedrecords derive(is_active = false(),",
+						"          effective_end_dt = currentDate()) ~> derivedexpireOld",
+						"derivedexpireOld alterRow(updateIf(true())) ~> alterexpired",
+						"cstype2@changedrecords derive(is_active = true(),",
+						"          effective_start_dt = currentDate(),",
+						"          effective_end_dt = toDate(null())) ~> derivedinsert",
+						"derivedinsert alterRow(insertIf(true())) ~> alertinsert",
+						"alterexpired select(mapColumn(",
+						"          emp_id = cstype2@changedrecords@emp_id,",
+						"          first_name = cstype2@changedrecords@first_name,",
+						"          last_name = cstype2@changedrecords@last_name,",
+						"          dept = cstype2@changedrecords@dept,",
+						"          title = cstype2@changedrecords@title,",
+						"          email = cstype2@changedrecords@email,",
+						"          phone = cstype2@changedrecords@phone,",
+						"          hashdiff = cstype2@changedrecords@hashdiff,",
+						"          employee_sk,",
+						"          is_active,",
+						"          effective_start_dt,",
+						"          effective_end_dt",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> expiredselect",
+						"alertinsert select(mapColumn(",
+						"          emp_id = cstype2@changedrecords@emp_id,",
+						"          first_name = cstype2@changedrecords@first_name,",
+						"          last_name = cstype2@changedrecords@last_name,",
+						"          dept = cstype2@changedrecords@dept,",
+						"          title = cstype2@changedrecords@title,",
+						"          email = cstype2@changedrecords@email,",
+						"          phone = cstype2@changedrecords@phone,",
+						"          hashdiff = cstype2@changedrecords@hashdiff,",
+						"          employee_sk,",
+						"          is_active,",
+						"          effective_start_dt,",
+						"          effective_end_dt",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> insertselect",
 						"union1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1354,12 +1391,27 @@
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
-						"     updateable:false,",
+						"     updateable:true,",
 						"     upsertable:false,",
+						"     keys:['employee_sk'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          employee_sk,",
+						"          emp_id,",
+						"          first_name,",
+						"          last_name,",
+						"          dept,",
+						"          title,",
+						"          email,",
+						"          phone,",
+						"          hashdiff,",
+						"          is_active,",
+						"          effective_start_dt,",
+						"          effective_end_dt",
+						"     )) ~> sink1"
 					]
 				}
 			},
