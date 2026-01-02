@@ -107,7 +107,7 @@
 				"     !isNull(emptable@emp_id) &&is_active==false(),",
 				"     disjoint: false) ~> cstype2@(newrecords, changedrecords, inactiverecords)",
 				"cstype2@newrecords alterRow(insertIf(true())) ~> arinsert",
-				"cstype2@changedrecords alterRow(updateIf(true())) ~> changedreccords",
+				"cstype2@changedrecords alterRow(upsertIf(true())) ~> changedreccords",
 				"cstype2@inactiverecords alterRow(updateIf(true())) ~> arinactive",
 				"arinsert select(mapColumn(",
 				"          emp_id = cstype2@newrecords@emp_id,",
