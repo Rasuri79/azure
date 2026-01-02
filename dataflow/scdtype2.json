@@ -13,7 +13,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "dimEmployee",
+						"referenceName": "dim_employee",
 						"type": "DatasetReference"
 					},
 					"name": "emptable"
@@ -101,7 +101,7 @@
 				"     ignoreNoFilesFound: false) ~> empcsv",
 				"source(output(",
 				"          employee_sk as integer,",
-				"          emp_id as integer,",
+				"          emp_id as string,",
 				"          first_name as string,",
 				"          last_name as string,",
 				"          dept as string,",
